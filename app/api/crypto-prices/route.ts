@@ -1,8 +1,28 @@
 const API_KEY = process.env.CRYPTOCOMPARE_API_KEY;
 // Use CryptoCompare API for historical data
-const CRYPTOCOMPARE_API_BASE = 'https://min-api.cryptocompare.com/data';
+const CRYPTOCOMPARE_API_BASE = 'https://min-api.cryptocompare.com/data/v2';
 const MAX_DAILY_LIMIT = 2000;
 const SECONDS_PER_DAY = 60 * 60 * 24;
+const SYMBOL_BY_CRYPTO = {
+  bitcoin: 'BTC',
+  ethereum: 'ETH',
+  solana: 'SOL',
+  xrp: 'XRP',
+} as const;
+const SUPPORTED_CRYPTOS = Object.keys(SYMBOL_BY_CRYPTO) as Array<keyof typeof SYMBOL_BY_CRYPTO>;
+
+interface CryptoCompareCandle {
+  time: number;
+  close: number;
+}
+
+interface CryptoCompareHistodayResponse {
+  Response: string;
+  Message?: string;
+  Data?: {
+    Data?: CryptoCompareCandle[];
+  };
+}
 
 export async function GET(request: Request) {
   try {
@@ -19,9 +39,9 @@ export async function GET(request: Request) {
       );
     }
 
-    if (!['bitcoin', 'ethereum'].includes(crypto)) {
+    if (!SUPPORTED_CRYPTOS.includes(crypto as keyof typeof SYMBOL_BY_CRYPTO)) {
       return Response.json(
-        { error: 'Invalid crypto. Must be bitcoin or ethereum' },
+        { error: `Invalid crypto. Must be one of: ${SUPPORTED_CRYPTOS.join(', ')}` },
         { status: 400 }
       );
     }
@@ -38,8 +58,8 @@ export async function GET(request: Request) {
     }
 
     // Fetch from CryptoCompare (historical daily data)
-    const fsym = crypto === 'bitcoin' ? 'BTC' : 'ETH';
-    const allPoints: Array<{ time: number; close: number }> = [];
+    const fsym = SYMBOL_BY_CRYPTO[crypto as keyof typeof SYMBOL_BY_CRYPTO];
+    const allPoints: CryptoCompareCandle[] = [];
     let currentEnd = endTimestamp;
 
     while (currentEnd >= startTimestamp) {
@@ -50,6 +70,7 @@ export async function GET(request: Request) {
       url.searchParams.append('fsym', fsym);
       url.searchParams.append('tsym', 'EUR');
       url.searchParams.append('limit', limit.toString());
+      url.searchParams.append('aggregate', '1');
       url.searchParams.append('toTs', currentEnd.toString());
       if (API_KEY) {
         url.searchParams.append('api_key', API_KEY);
@@ -66,14 +87,14 @@ export async function GET(request: Request) {
         throw new Error(`CryptoCompare API error: ${response.statusText} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as CryptoCompareHistodayResponse;
 
       if (data.Response !== 'Success') {
         console.error('CryptoCompare API error:', data.Message);
         throw new Error(`CryptoCompare API error: ${data.Message}`);
       }
 
-      const chunk = data.Data as Array<{ time: number; close: number }>;
+      const chunk = data.Data?.Data ?? [];
       if (!chunk || chunk.length === 0) {
         break;
       }

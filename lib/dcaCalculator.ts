@@ -13,32 +13,32 @@ export function calculateDCA(
   const cryptoQuantity: number[] = [];
   const prices: number[] = [];
 
-   let totalCryptoQuantity = 0;
-   let totalInvestedAmount = 0;
+  let totalCryptoQuantity = 0;
+  let totalInvestedAmount = 0;
 
-   // Initial investment
-   if (historicalPrices.length > 0) {
-     const initialPrice = historicalPrices[0].price;
-     totalCryptoQuantity = initialCapital / initialPrice;
-     totalInvestedAmount = initialCapital;
+  // Initial investment at selected start date (or closest available before that date)
+  const initialPrice = findPriceAtOrBeforeDate(startDate, historicalPrices);
+  if (initialPrice !== null) {
+    totalCryptoQuantity = initialCapital / initialPrice;
+    totalInvestedAmount = initialCapital;
 
-     dates.push(new Date(startDate));
-     investedCapital.push(totalInvestedAmount);
-     cryptoQuantity.push(totalCryptoQuantity);
-     portfolioValues.push(totalCryptoQuantity * initialPrice);
-     prices.push(initialPrice);
-   }
+    dates.push(new Date(startDate));
+    investedCapital.push(totalInvestedAmount);
+    cryptoQuantity.push(totalCryptoQuantity);
+    portfolioValues.push(totalCryptoQuantity * initialPrice);
+    prices.push(initialPrice);
+  }
 
-   // Monthly additions
-   let currentDate = new Date(startDate);
-   while (currentDate < endDate) {
-     // Move to next month
-     currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+  // Monthly additions
+  let currentDate = new Date(startDate);
+  while (currentDate < endDate) {
+    // Move to next month
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
 
-     if (currentDate > endDate) break;
+    if (currentDate > endDate) break;
 
-    // Find price at or near this date
-    const price = findClosestPrice(currentDate, historicalPrices);
+    // Use price at this purchase date (or latest available before this date)
+    const price = findPriceAtOrBeforeDate(currentDate, historicalPrices);
     if (!price) continue;
 
     // Add monthly amount
@@ -54,6 +54,23 @@ export function calculateDCA(
     prices.push(price);
   }
 
+  // Ensure final portfolio value is measured at endDate
+  const endPrice = findPriceAtOrBeforeDate(endDate, historicalPrices);
+  if (endPrice !== null && dates.length > 0) {
+    const lastIndex = dates.length - 1;
+    if (isSameMonthAndYear(dates[lastIndex], endDate)) {
+      dates[lastIndex] = new Date(endDate);
+      portfolioValues[lastIndex] = totalCryptoQuantity * endPrice;
+      prices[lastIndex] = endPrice;
+    } else {
+      dates.push(new Date(endDate));
+      investedCapital.push(totalInvestedAmount);
+      cryptoQuantity.push(totalCryptoQuantity);
+      portfolioValues.push(totalCryptoQuantity * endPrice);
+      prices.push(endPrice);
+    }
+  }
+
   return {
     dates,
     portfolioValues,
@@ -63,22 +80,30 @@ export function calculateDCA(
   };
 }
 
-function findClosestPrice(date: Date, prices: PriceData[]): number | null {
+function isSameMonthAndYear(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+}
+
+function findPriceAtOrBeforeDate(date: Date, prices: PriceData[]): number | null {
   if (prices.length === 0) return null;
 
-  const timestamp = date.getTime();
-  let closest = prices[0];
-  let minDiff = Math.abs(timestamp - closest.timestamp);
+  const target = date.getTime();
+  let candidate: PriceData | null = null;
 
   for (const price of prices) {
-    const diff = Math.abs(timestamp - price.timestamp);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = price;
+    if (price.timestamp <= target) {
+      candidate = price;
+      continue;
     }
+    break;
   }
 
-  return closest.price;
+  // If no earlier price exists in range, use first available price after target date.
+  if (!candidate) {
+    return prices[0].price;
+  }
+
+  return candidate.price;
 }
 
 export function prepareChartData(

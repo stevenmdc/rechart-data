@@ -10,12 +10,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { ChartDataPoint } from '@/types';
+import { ChartDataPoint, CryptoType } from '@/types';
 
 interface DCAChartProps {
   data: ChartDataPoint[];
   isLoading: boolean;
-  cryptoType: 'bitcoin' | 'ethereum';
+  cryptoType: CryptoType;
 }
 
 export function DCAChart({ data, isLoading, cryptoType }: DCAChartProps) {
@@ -35,7 +35,13 @@ export function DCAChart({ data, isLoading, cryptoType }: DCAChartProps) {
     );
   }
 
-  const lineColor = cryptoType === 'bitcoin' ? '#f97316' : '#a855f7';
+  const lineColorByCrypto: Record<CryptoType, string> = {
+    bitcoin: '#f97316',
+    ethereum: '#a855f7',
+    solana: '#14f195',
+    xrp: '#22d3ee',
+  };
+  const lineColor = lineColorByCrypto[cryptoType];
 
   return (
     <div className="bg-midnight-900 border border-slate-700 rounded-lg p-6">

@@ -1,6 +1,7 @@
 // components/Sidebar/DatePicker.tsx
 'use client';
 
+import { useRef } from 'react';
 import { Calendar } from 'lucide-react';
 
 interface DatePickerProps {
@@ -18,12 +19,34 @@ export function DatePicker({
   min,
   max,
 }: DatePickerProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleOpenPicker = () => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+  };
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-white">{label}</label>
-      <div className="relative">
-        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white" size={18} />
+      <div className="relative  items-center">
+        <button
+          type="button"
+          onClick={handleOpenPicker}
+          aria-label={`Ouvrir le calendrier: ${label}`}
+          className="absolute left-2 top-1/2 -translate-y-1/2 hover:text-slate-200 rounded p-1 cursor-pointer z-10"
+        >
+          <Calendar size={16} />
+        </button>
         <input
+          ref={inputRef}
           type="date"
           value={value}
           onChange={(e) => onChange(e.target.value)}

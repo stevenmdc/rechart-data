@@ -1,4 +1,4 @@
-export type CryptoType = 'bitcoin' | 'ethereum';
+export type CryptoType = 'bitcoin' | 'ethereum' | 'solana' | 'xrp';
 
 export interface FormInputs {
   crypto: CryptoType;
@@ -19,12 +19,20 @@ export interface ChartDataPoint {
   investedCapital: number;
 }
 
+export interface CalculationMethodDetails {
+  initialPrice: number;
+  finalPrice: number;
+  totalCryptoQuantity: number;
+  monthlyInvestmentsCount: number;
+}
+
 export interface CalculationResult {
   totalInvested: number;
   finalValue: number;
   roi: number;
   roiPercentage: number;
   chartData: ChartDataPoint[];
+  method?: CalculationMethodDetails;
 }
 
 export interface DCAResult {

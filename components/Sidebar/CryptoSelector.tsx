@@ -1,8 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { CryptoType } from '@/types';
-import { Bitcoin } from 'lucide-react';
-import { EthereumIcon } from './EthereumIcon';
+import { BitcoinIcon } from '../icons/BitcoinIcon';
+import { ETHIcon } from '../icons/ETHIcon';
+import { SolanaIcon } from '../icons/SolanaIcon';
+import { XRPIcon } from '../icons/XRPIcon';
 
 interface CryptoSelectorProps {
   selectedCrypto: CryptoType;
@@ -13,30 +16,54 @@ export function CryptoSelector({
   selectedCrypto,
   onSelectCrypto,
 }: CryptoSelectorProps) {
+   const options: Array<{
+     value: CryptoType;
+     label: string;
+     activeClass: string;
+     icon: ReactNode;
+   }> = [
+     {
+       value: 'bitcoin',
+       label: 'Bitcoin',
+       activeClass: 'bg-orange-500/80 text-white',
+       icon: <BitcoinIcon />,
+     },
+     {
+       value: 'ethereum',
+       label: 'Ethereum',
+       activeClass: 'bg-purple-500/80 text-white',
+       icon: <ETHIcon />,
+     },
+     {
+       value: 'solana',
+       label: 'Solana',
+       activeClass: 'bg-emerald-500/80 text-white',
+       icon: <SolanaIcon />,
+     },
+     {
+       value: 'xrp',
+       label: 'XRP',
+       activeClass: 'bg-cyan-500/80 text-white',
+       icon: <XRPIcon />,
+     },
+   ];
+
   return (
-    <div className="flex gap-3">
-      <button
-        onClick={() => onSelectCrypto('bitcoin')}
-        className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
-          selectedCrypto === 'bitcoin'
-            ? 'bg-orange-500 text-white'
-            : 'bg-midnight-800 text-white hover:bg-midnight-700'
-        }`}
-      >
-        <Bitcoin size={20} />
-        <span>Bitcoin</span>
-      </button>
-      <button
-        onClick={() => onSelectCrypto('ethereum')}
-        className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
-          selectedCrypto === 'ethereum'
-            ? 'bg-purple-500 text-white'
-            : 'bg-midnight-800 text-white hover:bg-midnight-700'
-        }`}
-      >
-        <EthereumIcon />
-        <span>Ethereum</span>
-      </button>
+    <div className="grid grid-cols-2 gap-3">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onSelectCrypto(option.value)}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-semibold transition-all cursor-pointer ${
+            selectedCrypto === option.value
+              ? option.activeClass
+              : 'bg-midnight-800 text-white hover:bg-midnight-700'
+          }`}
+        >
+          {option.icon}
+          <span>{option.label}</span>
+        </button>
+      ))}
     </div>
   );
 }

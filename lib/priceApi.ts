@@ -8,11 +8,9 @@ export async function fetchHistoricalPrices(
   const from = Math.floor(startDate.getTime() / 1000);
   const to = Math.floor(endDate.getTime() / 1000);
 
-  const cryptoId = crypto === 'bitcoin' ? 'bitcoin' : 'ethereum';
-
   try {
     const response = await fetch(
-      `/api/crypto-prices?crypto=${cryptoId}&from=${from}&to=${to}`
+      `/api/crypto-prices?crypto=${crypto}&from=${from}&to=${to}`
     );
 
     if (!response.ok) {
