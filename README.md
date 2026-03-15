@@ -1,5 +1,7 @@
 # DCA Crypto Calculator
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A modern web application to simulate Dollar Cost Averaging (DCA) strategies for Bitcoin and Ethereum investments.
 
 ## Features
