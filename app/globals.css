@@ -1,33 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0d1421;
+  --background: #f4ecdd;
+  --foreground: #14213d;
+  --card: rgba(255, 250, 240, 0.82);
+  --card-strong: #14213d;
+  --muted: #5f6c82;
+  --coral: #ff6b35;
+  --teal: #2a9d8f;
+  --gold: #f4a261;
+  --sand: #fff7ea;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-midnight: #0d1421;
+  --color-card: var(--card);
+  --color-card-strong: var(--card-strong);
+  --color-muted: var(--muted);
+  --color-coral: var(--coral);
+  --color-teal: var(--teal);
+  --color-gold: var(--gold);
+  --color-sand: var(--sand);
+  --color-ink: #14213d;
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d1421;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  margin: 0;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 107, 53, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 15%, rgba(42, 157, 143, 0.2), transparent 24%),
+    linear-gradient(180deg, #fbf5eb 0%, #f4ecdd 46%, #efe5d2 100%);
+  font-family: var(--font-space-grotesk), sans-serif;
 }
 
-input[type='date']::-webkit-calendar-picker-indicator {
-  pointer-events: none;
-  filter: invert(0.8) sepia(0.5);
-  opacity: 0.08;
+::selection {
+  color: #fffaf1;
+  background: rgba(20, 33, 61, 0.82);
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-ibm-plex-mono), monospace;
 }
