@@ -33,7 +33,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [showDetails, setShowDetails] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
 
   const applyDataset = (nextDataset: ParsedJsonDataset) => {
     const defaults = getDefaultChartConfig(nextDataset);
@@ -190,12 +190,14 @@ export default function Home() {
             yKeys={yKeys}
           />
 
-          <div className="flex flex-col gap-3 rounded-[1.35rem] border border-ink/10 bg-white/75 px-4 py-4 shadow-[0_12px_40px_rgba(20,33,61,0.05)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-ink/45">Insights</p>
-            </div>
+          <div className="rounded-[1.35rem] border border-ink/10 bg-white/75 px-4 py-3 shadow-[0_12px_40px_rgba(20,33,61,0.05)] backdrop-blur">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-ink/45">Insights</p>
+                <p className="mt-1 text-sm text-ink/58">Summary and table in a single compact panel.</p>
+              </div>
             <button
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-sand px-4 py-2 text-sm font-medium text-ink transition hover:border-ink/25"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-sand px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-ink transition hover:border-ink/25"
               onClick={() => setShowDetails((currentValue) => !currentValue)}
               type="button"
             >
@@ -203,12 +205,15 @@ export default function Home() {
               {showDetails ? 'Hide details' : 'Show details'}
               {showDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
+            </div>
           </div>
 
           {showDetails ? (
-            <section className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-              <DataSummary dataset={dataset} xKey={xKey} yKeys={yKeys} />
-              <DataPreviewTable dataset={dataset} />
+            <section className="rounded-[1.35rem] border border-ink/10 bg-white/75 p-4 shadow-[0_12px_40px_rgba(20,33,61,0.05)] backdrop-blur">
+              <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+                <DataSummary compact dataset={dataset} xKey={xKey} yKeys={yKeys} />
+                <DataPreviewTable compact dataset={dataset} />
+              </div>
             </section>
           ) : null}
         </main>
